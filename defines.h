@@ -3,6 +3,12 @@
  * \author Alfred && Jorshua Briones
  * \date octubre-2021
  */
+
+struct Nodo {
+    int data;
+    struct nodo *next;
+};
+
 struct Clock
 {
     int ciclo;
