@@ -21,6 +21,7 @@ struct Timer
 
 typedef struct PCB{
     int idPCB;
+    bol prioritario;
     int tiempo_vida;
     Timer timer;
 }PCB;

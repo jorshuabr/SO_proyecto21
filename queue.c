@@ -5,7 +5,7 @@
  */
 #include<stdio.h>
 #include<stdlib.h>
-#include<defines.h>
+#include"defines.h"
 
 struct nodo *head = NULL;
 struct nodo *tail = NULL;

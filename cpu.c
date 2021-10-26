@@ -5,7 +5,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include cpu.h
+#include "defines.h"
 
 //Como documentar en C  http://profesores.elo.utfsm.cl/~agv/elo330/2s04/projects/doxigen/documentando.html
 
@@ -36,6 +36,4 @@ void newCPU(int cantCPU, int cantCore, int cantHilos){
             }   
         }
     }
-    
-   
 }
