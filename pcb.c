@@ -5,8 +5,11 @@
  */
 #include "defines.h"
 
-
-struct pcb * crearPcb(int id){
+/**
+ * \fn Crea una nueva PCB
+ * \param id identificador de PCB
+ * */
+struct PCB * crearPcb(int id){
     struct PCB * tarea = malloc(sizeof(PCB));
     tarea -> idPCB = id + 400;
 }
