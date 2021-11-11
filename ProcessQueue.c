@@ -9,19 +9,24 @@
 #define COLA_TOTAL 1000
 #define COLA_CORE 30
 
-struct ProcessQueue* PQ;
+struct ProcessQueue* pq;
 struct nodo *head = NULL;
 struct nodo *tail = NULL;
 
-
-void initialize(){
-    PQ = malloc(sizeof(PQ));
-    PQ->head=head;
-    PQ->tail=tail;
-    PQ->count = 0;
-    PQ->max = COLA_TOTAL;
+/**
+ * \fn Método que inicializa la colo general de procesos
+ * */
+void initialize_queue(){
+    pq = malloc(sizeof(pq));
+    pq->head=head;
+    pq->tail=tail;
+    pq->count = 0;
+    pq->max = COLA_TOTAL;
 }
-
+/**
+ * \fn Función que genera una estructura de cola con un tamaño determinado
+ * esta cola esta diseñada para los cores.
+ * */
 ProcessQueue* init_queue_core(){
     struct ProcessQueue* queue_core= malloc(sizeof(ProcessQueue));
     queue_core->head= NULL;

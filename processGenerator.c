@@ -14,13 +14,13 @@
 /**
  * \fn llama a la función crearPcb() y las agrega a la cola general de tareas generalProcessQueue
  * \param  NPCB cantidad de tareas a crear
- * \param  vTak vector donde se almacenarán las tareas 
+ * \param  generalProcessQueue vector donde se almacenarán las tareas 
  * */
-void* processGenerator(int *NPCB, ProcessQueue generalProcessQueue{
+void* processGenerator(int *NPCB, ProcessQueue generalProcessQueue){
     int i;
-    for (i = 0; i < generalProcessQueue->size(); i++)
+    for (i = 0; i < size(generalProcessQueue); i++)
     {
         struct PCB * task = crearPcb(i);   
-        vTask[i] = task;
+        enque(*task, &generalProcessQueue); //dudas sobre pasar el objeto al que hace referencia el puntero
     }
 }

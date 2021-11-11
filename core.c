@@ -9,7 +9,9 @@
  * \fn Crea un nuevo core
  * \param id identificador de core
  * */
-struct Core * crearCore(int id){
+struct Core * crearCore(int id, int cantHilos ){
     struct Core * newCore = malloc(sizeof(Core));
     newCore -> idCore = id + 200;
+    core-> listHilos = (Hilo*) malloc(sizeof(Hilo)*cantHilos);
+    return newCore;
 }

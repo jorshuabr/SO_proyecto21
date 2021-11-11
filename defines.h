@@ -9,29 +9,15 @@
 #define MAX_THREADS 20
 
 
-struct Clock
-{
-    int ciclo;
-};
-
-typedef struct Timer
-{
-    int idTimer;
-}Timer;
-
 typedef struct PCB{
     int idPCB;
     int tiempo_vida;
 }PCB;
 
-typedef struct Nodo {
-    PCB data;
-    struct Nodo* next;
-}Nodo;
-
 typedef struct Hilo{ //validar si cada hilo o cada core debe tener cola de tareas
     int idHilo;
     PCB task;
+    int idCorePadre;
 } Hilo;
 
 typedef struct Core{
@@ -45,7 +31,7 @@ typedef struct CPU{
     Core* listCores[MAX_CORES];
 } CPU;
 
-struct Machine{
+typedef struct Machine{
     CPU* listaCPUs[MAX_CPUS];
 }Machine; 
 
@@ -56,3 +42,7 @@ typedef struct ProcessQueue{
     int count;
 } ProcessQueue;
 
+typedef struct Nodo {
+    PCB data;
+    struct Nodo* next;
+}Nodo;
