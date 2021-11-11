@@ -9,9 +9,9 @@
  * \fn Crea un nuevo hilo
  * \param id identificador de hilo
  * */
-struct CPU * crearCpu(int id, int cantCore ){
-    struct CPU * newCpu = malloc(sizeof(CPU));
+struct cpu_t * crearCpu(int id, int cantCore ){
+    struct cpu_t * newCpu = malloc(sizeof(cpu_t));
     newCpu -> idCPU  = id + 100;
-    cpu-> listCores = (Core*) malloc(sizeof(Core)*cantCore);
+    newCpu-> listCores = (core_t*) malloc(sizeof(core_t)*cantCore);
     return newCpu;
 }

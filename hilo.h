@@ -1,3 +1,3 @@
 #include "defines.h"
 
-Hilo * crearHilo(int id, int idCore);
+hilo_t * crearHilo(int id, int idCore);

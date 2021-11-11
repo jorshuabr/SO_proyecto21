@@ -16,8 +16,8 @@
 #define CLOCK_FRECUENCY 1000
 #define MAX_VIDA 1000
 
-extern Machine* machine;
-extern ProcessQueue pq;
+extern machine_t* machine;
+extern processQueue_t pq;
 pthread_mutex_t m_clock_timer;
 
 unsigned long int idPCB;
@@ -87,7 +87,7 @@ void* processGenerator(){
     if (buffer_timer_sch == 1)
     {
         buffer_timer_sch = 0;
-        struct PCB * task = crearPcb(idPCB);
+        struct pcb_t * task = crearPcb(idPCB);
         task->tiempo_vida=MAX_VIDA - rand()%(MAX_VIDA/2);
         idPCB++;
         enque(*task,&pq);

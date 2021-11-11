@@ -9,10 +9,10 @@
  * \fn Crea un nuevo hilo
  * \param id identificador de hilo
  * */
-struct Hilo * crearHilo(int id, int idCore){
-    struct Hilo * newHilo = malloc(sizeof(Hilo));
+struct hilo_t * crearHilo(int id, int idCore){
+    struct hilo_t * newHilo = malloc(sizeof(hilo_t));
     newHilo -> idHilo = id + 300;
     newHilo -> idCorePadre = idCore;
-    newHilo -> task= NULL;
+    newHilo -> task = (pcb_t *) malloc(sizeof(pcb_t));
     return newHilo;
 }

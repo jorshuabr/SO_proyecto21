@@ -16,10 +16,10 @@
 //quizas haya que meterlo en el main, esta por ver
 
 //Como documentar en C  http://profesores.elo.utfsm.cl/~agv/elo330/2s04/projects/doxigen/documentando.html
-struct Machine* machine;
+struct machine_t* machine;
 /**
- * \fn Se genera tantos objetos CPU, Cores e Hilos según se indique por parámetro.
- * \param  cantCPU cantidad de CPU a crear
+ * \fn Se genera tantos objetos cpu_t, Cores e Hilos según se indique por parámetro.
+ * \param  cantCPU cantidad de cpu_t a crear
  * \param  cantCore cantidad de Cores a crear
  * \param  cantHilo cantidad de Hilos a crear
  * */
@@ -29,9 +29,9 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
     
     
     int i,j,k;
-    machine= malloc(sizeof(Machine));
+    machine= malloc(sizeof(machine_t));
     if(cantCPU>MAX_Cpu) cantCPU=MAX_Cpu;
-    machine->listaCPUs = (CPU*) malloc(sizeof(CPU)* cantCPU);
+    machine->listaCPUs = (cpu_t*) malloc(sizeof(cpu_t)* cantCPU);
 
     //parametrización del tamaño de las estructuras
     
@@ -40,14 +40,14 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
 
     for (i = 0; i < cantCPU; i++)
     {
-        struct CPU * cpu = crearCpu(i, cantCore);
+        struct cpu_t * cpu = crearCpu(i, cantCore);
         for (j = 0; j < cantCore; j++)
         {
-            struct Core * core = crearCore(j, cantHilos);
+            struct core_t * core = crearCore(j, cantHilos);
             cpu  ->listCores[j] = *core;
             for (k = 0; k < cantHilos; k++)
             {
-                struct Hilo * thread = crearHilo(k, core->idCore);
+                struct hilo_t * thread = crearHilo(k, core->idCore);
                 core ->listHilos[k] = *thread;
             }   
         }

@@ -1,9 +1,9 @@
 #include "defines.h"
 
 void initialize_queue();
-ProcessQueue* init_queue_core();
+processQueue_t* init_queue_core();
 void print();
-PCB deque(ProcessQueue* p);
-void enque(PCB task, ProcessQueue* p);
-bool isEmpity(ProcessQueue* q);
-int size(ProcessQueue* q);
+pcb_t deque(processQueue_t* p);
+void enque(pcb_t task, processQueue_t* p);
+bool isEmpity(processQueue_t* q);
+int size(processQueue_t* q);

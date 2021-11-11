@@ -7,7 +7,7 @@
 #include "pcb.h"
 #include "queue.h"
 //#define NPCB 20;
-//#define PCB vTask[NPCB];
+//#define pcb_t vTask[NPCB];
 
 //cambiar el vector por processQueue
 
@@ -16,11 +16,11 @@
  * \param  NPCB cantidad de tareas a crear
  * \param  generalProcessQueue vector donde se almacenarán las tareas 
  * */
-void* processGenerator(int *NPCB, ProcessQueue generalProcessQueue){
+void* processGenerator(int *NPCB, processQueue_t generalProcessQueue){
     int i;
     for (i = 0; i < size(generalProcessQueue); i++)
     {
-        struct PCB * task = crearPcb(i);   
+        struct pcb_t * task = crearPcb(i);   
         enque(*task, &generalProcessQueue); //dudas sobre pasar el objeto al que hace referencia el puntero
     }
 }

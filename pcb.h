@@ -1,2 +1,2 @@
 #include "defines.h"
-PCB * crearPcb(int id);
+pcb_t * crearPcb(int id);

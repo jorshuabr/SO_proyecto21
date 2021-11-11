@@ -1,2 +1,2 @@
 #include "defines.h"
-Core * crearCore(int id, int cantHilos);
+core_t * crearCore(int id, int cantHilos);

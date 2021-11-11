@@ -12,7 +12,7 @@
  * de tareas de cada hilo.
  * \param generalProcessQueue vector de tareas principal
  * */
-void scheduler(ProcessQueue generalProcessQueue){
+void scheduler(processQueue_t generalProcessQueue){
     
     if (generalProcessQueue)
     {

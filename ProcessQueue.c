@@ -9,7 +9,7 @@
 #define COLA_TOTAL 1000
 #define COLA_CORE 30
 
-struct ProcessQueue* pq;
+struct processQueue_t* pq;
 struct nodo *head = NULL;
 struct nodo *tail = NULL;
 
@@ -27,8 +27,8 @@ void initialize_queue(){
  * \fn Función que genera una estructura de cola con un tamaño determinado
  * esta cola esta diseñada para los cores.
  * */
-ProcessQueue* init_queue_core(){
-    struct ProcessQueue* queue_core= malloc(sizeof(ProcessQueue));
+processQueue_t* init_queue_core(){
+    struct processQueue_t* queue_core= malloc(sizeof(processQueue_t));
     queue_core->head= NULL;
     queue_core->tail= NULL;
     queue_core->count = 0;
@@ -38,27 +38,27 @@ ProcessQueue* init_queue_core(){
  * \fn Función que retorna si la cola se encuentra vácia.
  * \return boolean.
  * */
-bool isEmpity(ProcessQueue* q)
+bool isEmpity(processQueue_t* q)
 {
     return q->count==0;
 }
 /**
  *
  */
-int size(ProcessQueue* q)
+int size(processQueue_t* q)
 {
     return q->count;
 }
 
 
 /**
- * \fn Método que agrega una tarea PCB a la cola, modelo FIFO.
- * \param  task un struct PCB que se añadira a la cola de tareas
+ * \fn Método que agrega una tarea pcb_t a la cola, modelo FIFO.
+ * \param  task un struct pcb_t que se añadira a la cola de tareas
  * */
-void enque(PCB task, ProcessQueue* p)
+void enque(pcb_t task, processQueue_t* p)
 {
-    struct Nodo *nuevo;
-    nuevo = malloc(sizeof(struct Nodo));
+    struct nodo_t *nuevo;
+    nuevo = malloc(sizeof(struct nodo_t));
     nuevo ->data = task;
     nuevo ->next = NULL;
     if (isEmpity(p)) {
@@ -77,11 +77,11 @@ void enque(PCB task, ProcessQueue* p)
  * \fn Método que elimina el primer nodo de la cola.
  * //no debería devolver su elemento?
  * */
-PCB deque(ProcessQueue* p)
+pcb_t deque(processQueue_t* p)
 {
-    struct PCB  cabeza;
+    struct pcb_t  cabeza;
     if (!isEmpity(p)) {
-        //PCB  taskDeleted = head -> data;
+        //pcb_t  taskDeleted = head -> data;
         cabeza = p->head->data;
         if (p->count==1) {
             p->head = NULL;
@@ -101,7 +101,7 @@ PCB deque(ProcessQueue* p)
  * */
 void print()
 {
-    struct Nodo *it = head;
+    struct nodo_t *it = head;
     printf("Listado de Elementos en cola:\n");
     while (it != NULL) {
         printf("%i - ", it->data);

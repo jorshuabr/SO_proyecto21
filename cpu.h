@@ -1,3 +1,3 @@
 #include "defines.h"
 
-struct CPU * crearCpu(int id, int cantCore);
+struct cpu_t * crearCpu(int id, int cantCore);
