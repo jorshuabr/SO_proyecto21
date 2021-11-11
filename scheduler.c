@@ -5,7 +5,7 @@
  * \date octubre-2021
  */
 #include "defines.h"
-#include "queue.h"
+#include "ProcessQueue.h"
 
 /**
  * \fn asigna cada tarea de la cola de procesos principal a la cola

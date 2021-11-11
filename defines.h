@@ -22,17 +22,17 @@ typedef struct Hilo{ //validar si cada hilo o cada core debe tener cola de tarea
 
 typedef struct Core{
     int idCore;
-    Hilo* listHilos[MAX_THREADS];
+    Hilo* listHilos;
     ProcessQueue queueTask;
 } Core;
 
 typedef struct CPU{
     int idCPU;
-    Core* listCores[MAX_CORES];
+    Core* listCores;
 } CPU;
 
 typedef struct Machine{
-    CPU* listaCPUs[MAX_CPUS];
+    CPU* listaCPUs;
 }Machine; 
 
 typedef struct ProcessQueue{

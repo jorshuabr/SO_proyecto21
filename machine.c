@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "defines.h"
+#include "hilo.h"
+#include "core.h"
+#include "cpu.h"
 #define MAX_Cpu MAX_CPUS
 #define MAX_Core MAX_CORES
 #define MAX_t MAX_THREADS
@@ -27,10 +30,11 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
     
     int i,j,k;
     machine= malloc(sizeof(Machine));
+    if(cantCPU>MAX_Cpu) cantCPU=MAX_Cpu;
     machine->listaCPUs = (CPU*) malloc(sizeof(CPU)* cantCPU);
 
     //parametrización del tamaño de las estructuras
-    if(cantCPU>MAX_Cpu) cantCPU=MAX_Cpu;
+    
     if(cantCore>MAX_Core) cantCore=MAX_Core;
     if(cantHilos>MAX_t) cantHilos=MAX_t;
 
@@ -40,11 +44,11 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
         for (j = 0; j < cantCore; j++)
         {
             struct Core * core = crearCore(j, cantHilos);
-            cpu  ->listCores[j] = core;
+            cpu  ->listCores[j] = *core;
             for (k = 0; k < cantHilos; k++)
             {
-                struct Hilo * thread = crearHilo(k);
-                core ->listHilos[k] = thread;
+                struct Hilo * thread = crearHilo(k, core->idCore);
+                core ->listHilos[k] = *thread;
             }   
         }
     }
