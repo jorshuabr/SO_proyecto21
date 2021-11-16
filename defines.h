@@ -3,6 +3,7 @@
  * \author Alfred && Jorshua Briones
  * \date octubre-2021
  */
+
 #include <stdbool.h>
 #include <stddef.h>
 #define MAX_CPUS 4
