@@ -10,8 +10,8 @@
  * \param id identificador de core
  * \param cantHilos cantidad de hilos que contendrá el core
  * */
-struct core_t * crearCore(int id, int cantHilos ){
-    struct core_t * newCore = malloc(sizeof(core_t));
+core_t * crearCore(int id, int cantHilos ){
+    core_t * newCore = malloc(sizeof(core_t));
     newCore -> idCore = id + 200;
     newCore-> listHilos = (hilo_t*) malloc(sizeof(hilo_t)*cantHilos);
     return newCore;
