@@ -6,18 +6,20 @@
  */
 #include "defines.h"
 #include "ProcessQueue.h"
+#include<stdlib.h>
 
+extern processQueue_t pq;
 /**
  * \fn asigna cada tarea de la cola de procesos principal a la cola
  * de tareas de cada hilo.
- * \param generalProcessQueue vector de tareas principal
+ * \param generalProcessQueue cola de tareas principal
  * */
 void scheduler(processQueue_t generalProcessQueue){
     
-    if (generalProcessQueue)
-    {
+    //if (generalProcessQueue)
+    //{
         /* code */
-    }
+    //}
     
 
 }

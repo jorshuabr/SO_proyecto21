@@ -5,35 +5,39 @@
  */
 #include<stdio.h>
 #include<stdlib.h>
+#include <unistd.h>
 #include"defines.h"
+#include "globals.h"
 #define COLA_TOTAL 1000
 #define COLA_CORE 30
 
-struct processQueue_t* pq;
-struct nodo *head = NULL;
-struct nodo *tail = NULL;
+extern processQueue_t pq;
+nodo_t *head = NULL;
+nodo_t *tail = NULL;
 
 /**
- * \fn Método que inicializa la colo general de procesos
+ * \fn Método que inicializa la cola general de procesos
  * */
 void initialize_queue(){
-    pq = malloc(sizeof(pq));
-    pq->head=head;
-    pq->tail=tail;
-    pq->count = 0;
-    pq->max = COLA_TOTAL;
+    pq = *(processQueue_t *)malloc(sizeof(processQueue_t));
+    pq.head=head;
+    pq.tail=tail;
+    pq.count = 0;
+    pq.max = COLA_TOTAL;
 }
 /**
  * \fn Función que genera una estructura de cola con un tamaño determinado
  * esta cola esta diseñada para los cores.
  * */
 processQueue_t* init_queue_core(){
-    struct processQueue_t* queue_core= malloc(sizeof(processQueue_t));
+    processQueue_t* queue_core= malloc(sizeof(processQueue_t));
     queue_core->head= NULL;
     queue_core->tail= NULL;
     queue_core->count = 0;
     queue_core->max= COLA_CORE;
+    return queue_core;
 }
+
 /**
  * \fn Función que retorna si la cola se encuentra vácia.
  * \return boolean.
@@ -57,8 +61,8 @@ int size(processQueue_t* q)
  * */
 void enque(pcb_t task, processQueue_t* p)
 {
-    struct nodo_t *nuevo;
-    nuevo = malloc(sizeof(struct nodo_t));
+    nodo_t *nuevo;
+    nuevo = malloc(sizeof(nodo_t));
     nuevo ->data = task;
     nuevo ->next = NULL;
     if (isEmpity(p)) {
@@ -79,9 +83,9 @@ void enque(pcb_t task, processQueue_t* p)
  * */
 pcb_t deque(processQueue_t* p)
 {
-    struct pcb_t  cabeza;
+    pcb_t  cabeza;
     if (!isEmpity(p)) {
-        //pcb_t  taskDeleted = head -> data;
+
         cabeza = p->head->data;
         if (p->count==1) {
             p->head = NULL;
@@ -99,12 +103,14 @@ pcb_t deque(processQueue_t* p)
 /**
  * \fn Método que imprime los elementos de la cola.
  * */
-void print()
+void print(processQueue_t* p)
 {
-    struct nodo_t *it = head;
+    nodo_t *it = p->head;
     printf("Listado de Elementos en cola:\n");
-    while (it != NULL) {
-        printf("%i - ", it->data);
+    int i =0;
+    while (i != size(&p)) {
+        printf("PCB#  %d - con vida %d", it->data.idPCB, it->data.tiempo_vida);
+        printf("\n");
         it = it->next;
     }
     printf("\n");

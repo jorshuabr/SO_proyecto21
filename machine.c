@@ -9,14 +9,15 @@
 #include "hilo.h"
 #include "core.h"
 #include "cpu.h"
+#include "globals.h"
 #define MAX_Cpu MAX_CPUS
 #define MAX_Core MAX_CORES
 #define MAX_t MAX_THREADS
 
+extern machine_t* machine;
 //quizas haya que meterlo en el main, esta por ver
 
 //Como documentar en C  http://profesores.elo.utfsm.cl/~agv/elo330/2s04/projects/doxigen/documentando.html
-struct machine_t* machine;
 /**
  * \fn Se genera tantos objetos cpu_t, Cores e Hilos según se indique por parámetro.
  * \param  cantCPU cantidad de cpu_t a crear
@@ -29,7 +30,7 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
     
     
     int i,j,k;
-    machine= malloc(sizeof(machine_t));
+    machine = malloc(sizeof(machine_t));
     if(cantCPU>MAX_Cpu) cantCPU=MAX_Cpu;
     machine->listaCPUs = (cpu_t*) malloc(sizeof(cpu_t)* cantCPU);
 
@@ -40,14 +41,16 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
 
     for (i = 0; i < cantCPU; i++)
     {
-        struct cpu_t * cpu = crearCpu(i, cantCore);
+        cpu_t * cpu = crearCpu(i, cantCore);
+        machine->listaCPUs[i]=*cpu;
+        
         for (j = 0; j < cantCore; j++)
         {
-            struct core_t * core = crearCore(j, cantHilos);
+            core_t * core = crearCore(j, cantHilos);
             cpu  ->listCores[j] = *core;
             for (k = 0; k < cantHilos; k++)
             {
-                struct hilo_t * thread = crearHilo(k, core->idCore);
+                hilo_t * thread = crearHilo(k, core->idCore);
                 core ->listHilos[k] = *thread;
             }   
         }

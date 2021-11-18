@@ -4,6 +4,7 @@
  * \date octubre-2021
  */
 #include "defines.h"
+#include <stdlib.h>
 
 /**
  * \fn Crea un nuevo core

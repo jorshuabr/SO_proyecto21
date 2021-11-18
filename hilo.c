@@ -4,15 +4,16 @@
  * \date octubre-2021
  */
 #include "defines.h"
-
+#include<stdlib.h>
 /**
  * \fn Crea un nuevo hilo
  * \param id identificador de hilo
  * */
-struct hilo_t * crearHilo(int id, int idCore){
-    struct hilo_t * newHilo = malloc(sizeof(hilo_t));
+hilo_t * crearHilo(int id, int idCore){
+    hilo_t * newHilo = malloc(sizeof(hilo_t));
     newHilo -> idHilo = id + 300;
     newHilo -> idCorePadre = idCore;
-    newHilo -> task = (pcb_t *) malloc(sizeof(pcb_t));
+    newHilo -> task = *(pcb_t *) malloc(sizeof(pcb_t)); // 
+    //newHilo -> pthread_real = NULL;
     return newHilo;
 }

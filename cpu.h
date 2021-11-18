@@ -1,3 +1,7 @@
-#include "defines.h"
+#ifndef CPUH
+#define CPUH
 
-struct cpu_t * crearCpu(int id, int cantCore);
+#include "defines.h"
+cpu_t * crearCpu(int id, int cantCore);
+
+#endif
