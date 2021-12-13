@@ -43,14 +43,13 @@ void newMachine(int cantCPU, int cantCore, int cantHilos){
     {
         cpu_t * cpu = crearCpu(i, cantCore);
         machine->listaCPUs[i]=*cpu;
-        
         for (j = 0; j < cantCore; j++)
         {
             core_t * core = crearCore(j, cantHilos);
             cpu  ->listCores[j] = *core;
             for (k = 0; k < cantHilos; k++)
             {
-                hilo_t * thread = crearHilo(k, core->idCore);
+                hilo_t * thread = crearHilo(10*j+k);
                 core ->listHilos[k] = *thread;
             }   
         }

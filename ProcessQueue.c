@@ -5,7 +5,6 @@
  */
 #include<stdio.h>
 #include<stdlib.h>
-#include <unistd.h>
 #include"defines.h"
 #include "globals.h"
 #define COLA_TOTAL 1000
@@ -42,7 +41,7 @@ processQueue_t* init_queue_core(){
  * \fn Función que retorna si la cola se encuentra vácia.
  * \return boolean.
  * */
-bool isEmpity(processQueue_t* q)
+bool isEmpty(processQueue_t* q)
 {
     return q->count==0;
 }
@@ -52,6 +51,11 @@ bool isEmpity(processQueue_t* q)
 int size(processQueue_t* q)
 {
     return q->count;
+}
+
+bool max(processQueue_t* q)
+{
+    return q->count==q->max;
 }
 
 
@@ -65,26 +69,29 @@ void enque(pcb_t task, processQueue_t* p)
     nuevo = malloc(sizeof(nodo_t));
     nuevo ->data = task;
     nuevo ->next = NULL;
-    if (isEmpity(p)) {
+    if (isEmpty(p)) {
         p->head = nuevo;
         p->tail = nuevo;
+        p->count++;
     }
-    else {
+    else if (!max(p)){
         p->tail->next=  nuevo;
         p->tail = nuevo;
+        p->count++;
     }
-    p->count++;
+    
 }
 
 
 /**
  * \fn Método que elimina el primer nodo de la cola.
- * //no debería devolver su elemento?
+ * \param p cola en la que se desee aplicar la operación
+ * \return PCB asociada al nodo eliminado.
  * */
 pcb_t deque(processQueue_t* p)
 {
     pcb_t  cabeza;
-    if (!isEmpity(p)) {
+    if (!isEmpty(p)) {
 
         cabeza = p->head->data;
         if (p->count==1) {

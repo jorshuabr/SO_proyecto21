@@ -3,6 +3,6 @@
 
 #include "defines.h"
 #include<stdlib.h>
-pcb_t * crearPcb(int id,int tiempoVida);
+pcb_t * crearPcb(int id);
 
 #endif
