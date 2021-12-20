@@ -27,7 +27,7 @@ typedef struct mmu_t
 }mmu_t;
 
 typedef struct physical_t{
-    unsigned int memoria;
+    int* memoria;
     int* tabla_paginas;
 }physical_t;
 

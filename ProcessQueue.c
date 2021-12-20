@@ -116,8 +116,7 @@ void print(processQueue_t* p)
     printf("Listado de Elementos en cola:\n");
     int i =0;
     while (i != size(&p)) {
-        printf("PCB#  %d - con vida %d", it->data.idPCB, it->data.tiempo_vida);
-        printf("\n");
+        printf("PCB#  %d \n", it->data.idPCB);
         it = it->next;
     }
     printf("\n");

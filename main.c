@@ -68,25 +68,27 @@ void inicializar(){
     initialize_queue();
     newMachine(cantidad->cpus, cantidad->cores, cantidad->hilos);
     printf("arrancar los hilos\n ");
-    int i,cpu,core;
+    int i,cpu,core,total;
     cpu=0;
     core=0;
-    for(i=0;i<cantidad->cpus*cantidad->cores;i++ ) colas_cores[i]=0;
-    for(i=0;i< (cantidad->cpus*cantidad->cores+5);i++){
+    total = cantidad->cpus*cantidad->cores;
+    for(i=0;i<total;i++ ) {colas_cores[i]=0;printf("todo correcto en vuelta %d \n",i);}
+    printf("crear colas bien\n ");
+    for(i=0;i< (total+5);i++){
         arrayThreads[i]=i;
-        if(i<(cantidad->cpus*cantidad->cores)){
+        if(i<(total){
             direccionCore(&cpu,&core,i);
             pthread_create(&arrayThreads[i],NULL,ejecutarCore,&(machine->listaCPUs[cpu].listCores[core]));
         }
-        else if (i==cantidad->cpus*cantidad->cores){
+        else if (i==total){
             pthread_create(&arrayThreads[i],NULL,m_clock,NULL);
-        }else if(i==cantidad->cpus*cantidad->cores+1){
+        }else if(i==total+1){
             pthread_create(&arrayThreads[i],NULL,m_timer1,NULL);
-        }else if(i==cantidad->cpus*cantidad->cores+2){
+        }else if(i==total+2){
             pthread_create(&arrayThreads[i],NULL,processGenerator,NULL);
-        }else if(i==cantidad->cpus*cantidad->cores+3){
+        }else if(i==total+3){
             pthread_create(&arrayThreads[i],NULL,m_scheduler,NULL);
-        }else if(i==cantidad->cpus*cantidad->cores+4){
+        }else if(i==total+4){
             pthread_create(&arrayThreads[i],NULL,m_timer2,NULL);
         }
     }
@@ -97,12 +99,12 @@ int main(int argc, char const *argv[])
 {
     cantidad= malloc(sizeof(cantidades_t));
     if (argc != 4){
-        printf("faltan o sobran parametros el orden es : cantidad->cpus, cantidad->coress, cantidad->hilos");
+        printf("faltan o sobran parametros el orden es : cantidad->cpus, cantidad->coress, cantidad->hilos \n");
         exit(1);
     }else{
-        cantidad->cpus=argv[1];
-        cantidad->cores=argv[2];
-        cantidad->hilos=argv[3];
+        cantidad->cpus=(int)argv[1];
+        cantidad->cores=(int)argv[2];
+        cantidad->hilos=(int)argv[3];
         inicializar();
         int i,j,k;
         pthread_mutex_lock(&m_clock_timer);
@@ -304,6 +306,10 @@ void* processGenerator(void *tid){
                 printf("la linea contiene %s",line);
                 j++;
 
+            }
+            j=0;
+            while(j<(len-1)){
+                
             }
             strcpy(task->meme->code,text);
             strcpy(task->meme->data,data);

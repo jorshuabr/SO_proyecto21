@@ -3,7 +3,7 @@
  * \author Alfred && Jorshua Briones
  * \date octubre-2021
  */
-#include "defines.h"s
+#include "defines.h"
 #include<stdlib.h>
 /**
  * \fn Crea un nuevo hilo
