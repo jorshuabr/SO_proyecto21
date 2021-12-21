@@ -72,11 +72,13 @@ void inicializar(){
     cpu=0;
     core=0;
     total = cantidad->cpus*cantidad->cores;
-    for(i=0;i<total;i++ ) {colas_cores[i]=0;printf("todo correcto en vuelta %d \n",i);}
+    for(i=0;i<total;i++ ) {
+        colas_cores[i]=0;printf("todo correcto en vuelta %d \n",i);
+    }
     printf("crear colas bien\n ");
     for(i=0;i< (total+5);i++){
         arrayThreads[i]=i;
-        if(i<(total){
+        if(i<(total)){
             direccionCore(&cpu,&core,i);
             pthread_create(&arrayThreads[i],NULL,ejecutarCore,&(machine->listaCPUs[cpu].listCores[core]));
         }
@@ -102,16 +104,18 @@ int main(int argc, char const *argv[])
         printf("faltan o sobran parametros el orden es : cantidad->cpus, cantidad->coress, cantidad->hilos \n");
         exit(1);
     }else{
-        cantidad->cpus=(int)argv[1];
-        cantidad->cores=(int)argv[2];
-        cantidad->hilos=(int)argv[3];
+        cantidad->cpus=atoi(argv[1]);
+        cantidad->cores=atoi(argv[2]);
+        cantidad->hilos=atoi(argv[3]);
+        
+        //sleep(1000000);
         inicializar();
         int i,j,k;
         pthread_mutex_lock(&m_clock_timer);
         for (i = 0; i < cantidad->cpus; i++)
         {
             printf("--> CPU %d \n", machine->listaCPUs[i].idCPU);
-            for (j = 0; j < cantidad->cores; j++)
+        for (j = 0; j < cantidad->cores; j++)
             {
                 printf(" ----> CORE %d \n", machine->listaCPUs[i].listCores[j].idCore);
                 for (k = 0; k < cantidad->hilos; k++)
