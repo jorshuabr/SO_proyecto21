@@ -44,6 +44,9 @@ int buscarCola();
 void direccionCore(int* cpu, int* core, int valor);
 void* ejecutarCore(void *core);
 int buscarDisponible(hilo_t * listaHilos);
+bool ejecutarCicloHilo(hilo_t* hiloActual);
+int buscarPaginaLibre();
+unsigned char* obtenerPalabra(int posicion);
 
 void inicializar(){
     colas_cores=malloc(sizeof(int)*cantidad->cpus*cantidad->cores);
@@ -139,9 +142,9 @@ int main(int argc, char const *argv[])
         }
         pthread_mutex_unlock(&m_clock_timer);    
         int cont=0;
-        while(1){    
+        /*while(1){    
             printf(""); 
-        }
+        }*/
         return 0;
     }
     
@@ -158,7 +161,7 @@ void* m_clock(void *tid){
         pthread_mutex_lock(&m_clock_timer);
         buffer_clock_timer++;
         tick_global++;
-        printf("");
+        //printf("");
         pthread_mutex_unlock(&m_clock_timer2);
         pthread_mutex_unlock(&m_clock_timer);
         usleep(1000);
@@ -203,14 +206,15 @@ void* m_timer2(void *tid){
                 {
                     for (k = 0; k < cantidad->hilos; k++)
                     {
-                        
-                        if(machine->listaCPUs[i].listCores[j].listHilos[k].ocupado){
-                            machine->listaCPUs[i].listCores[j].listHilos[k].task.tiempo_vida--;
-                            if(machine->listaCPUs[i].listCores[j].listHilos[k].task.tiempo_vida==0) {
-                                machine->listaCPUs[i].listCores[j].listHilos[k].ocupado=false;
-                                printf("el PCB con id %d en el core %d en el hilo %d ----> ha terminado  \n",machine->listaCPUs[i].listCores[j].listHilos[k].task.idPCB, machine->listaCPUs[i].listCores[j].idCore, machine->listaCPUs[i].listCores[j].listHilos[k].idHilo);
-                            }
+                        //ejecutar ciclo hilo, devuelve true -> vaciar volver a poner los reg y pcs al estado inicial
+                        hilo_t* iHilo = &machine->listaCPUs[i].listCores[j].listHilos[k]; 
+                        if (ejecutarCicloHilo(iHilo))
+                        {
+                            iHilo->pc = "X";
+                            iHilo->ir = "X";
                         }
+                        
+                        
                     }
                     
                 }
@@ -450,18 +454,23 @@ int buscarPaginaLibre(){
     return(encontrado)?i:-1;
 }
 
-bool ejecutarCicloHilo(hilo_t *hiloActual){
+bool ejecutarCicloHilo(hilo_t* hiloActual){
     bool terminado;
-    int  direccion_instruccion_act=0;
+    int  direccion_instruccion_act = 0;
     if (hiloActual->pc != "X"){
         direccion_instruccion_act=traducirDireccion(hiloActual->pc);
     }
 
     direccion_instruccion_act+= hiloActual->task.meme->pgb;
-    unsigned char* palabra =malloc(sizeof(unsigned char)*9);
+    unsigned char* palabra = malloc(sizeof(unsigned char)*9);
     palabra= obtenerPalabra(direccion_instruccion_act);
     strcpy(hiloActual->ir,palabra);
     char instruccion = palabra[0];
+    int direccion_registro;
+    char rx[2];
+    char v_direccion[7];
+    int i=2;
+    int direccion_virtual;
     switch (instruccion){
         //caso exit
         case 'F' : 
@@ -470,12 +479,12 @@ bool ejecutarCicloHilo(hilo_t *hiloActual){
 
         //caso load
         case '0' :
-            int direccion_registro;
-            char rx[2];
+            //int direccion_registro = 0;
+            //char rx[2];
             strcpy(rx,palabra[1]);
-            direccion_registro=traducirDireccion(rx);
-            char v_direccion[7];
-            int i=2;
+            direccion_registro = traducirDireccion(rx);
+            //char v_direccion[7];
+            //int i=2;
             while(i!=8){
                 char tmp[2];
                 sprintf(tmp,"%X",palabra[i]);
@@ -486,7 +495,7 @@ bool ejecutarCicloHilo(hilo_t *hiloActual){
                 }
                 i++;
             }
-            int direccion_virtual= traducirDireccion(v_direccion)+hiloActual->task.meme->pgb;
+            direccion_virtual= traducirDireccion(v_direccion)+hiloActual->task.meme->pgb;
             palabra=obtenerPalabra(direccion_virtual);
             int valor_memoria= traducirDireccion(palabra);
             hiloActual->registro[direccion_registro]=valor_memoria;
@@ -495,13 +504,13 @@ bool ejecutarCicloHilo(hilo_t *hiloActual){
 
         //caso store
         case '1':
-            int direccion_registro;
-            char rx[2];
+            //int direccion_registro;
+            //char rx[2];
             strcpy(rx,palabra[1]);
             direccion_registro=traducirDireccion(rx);
-            char v_direccion[7];
-            int i=2;
-            while(i!=8){
+            //char v_direccion[7];
+            //int i = 2;
+            while( i != 8){
                 char tmp[2];
                 sprintf(tmp,"%X",palabra[i]);
                 if(i==2){
@@ -511,7 +520,7 @@ bool ejecutarCicloHilo(hilo_t *hiloActual){
                 }
                 i++;
             }
-            int direccion_virtual= traducirDireccion(v_direccion)+hiloActual->pc;
+            direccion_virtual= traducirDireccion(v_direccion)+hiloActual->pc;
             unsigned char* valor_reg = malloc(sizeof(unsigned char)*9);
             sprintf(valor_reg,"%X",hiloActual->registro[direccion_registro]);
             while(valor_reg[8]!='\n'){
@@ -542,7 +551,7 @@ bool ejecutarCicloHilo(hilo_t *hiloActual){
             
         //caso add
         case '2':
-            char rx[2];
+            //har rx[2];
             strcpy(rx,palabra[1]);
             int direccion_registro_destino= traducirDireccion(rx);
             strcpy(rx,palabra[2]);
