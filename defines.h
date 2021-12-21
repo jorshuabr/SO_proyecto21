@@ -17,7 +17,7 @@
 typedef struct mm_t {
     unsigned char* code;
     unsigned char* data;
-    unsigned char* pgb;
+    int pgb;
 }mm_t;
 
 typedef struct mmu_t
@@ -29,6 +29,7 @@ typedef struct mmu_t
 typedef struct physical_t{
     int* memoria;
     int* tabla_paginas;
+    bool* pagina_ocupada;
 }physical_t;
 
 typedef struct pcb_t{

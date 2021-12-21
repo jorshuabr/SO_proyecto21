@@ -38,7 +38,7 @@ pthread_t* arrayThreads; //vector de hilos reales
 void* m_clock(void *tid); 
 void* m_timer1(void *tid);
 void* m_timer2(void *tid);
-void* processGenerator(void *tid);
+void* loader(void *tid);
 void* m_scheduler(void *tid);
 int buscarCola();
 void direccionCore(int* cpu, int* core, int valor);
@@ -51,6 +51,7 @@ void inicializar(){
     memoria_fisica = malloc(sizeof(physical_t));
     memoria_fisica->memoria= malloc(sizeof(int)*pow(2,24));
     memoria_fisica->tabla_paginas = malloc(sizeof(int)*49152);
+    memoria_fisica->pagina_ocupada = malloc(sizeof(bool)*49152);
     srand(time(0));  
     buffer_clock_timer=0;
     buffer_pg_sc=0;
@@ -87,14 +88,25 @@ void inicializar(){
         }else if(i==total+1){
             pthread_create(&arrayThreads[i],NULL,m_timer1,NULL);
         }else if(i==total+2){
-            pthread_create(&arrayThreads[i],NULL,processGenerator,NULL);
+            pthread_create(&arrayThreads[i],NULL,loader,NULL);
         }else if(i==total+3){
             pthread_create(&arrayThreads[i],NULL,m_scheduler,NULL);
         }else if(i==total+4){
             pthread_create(&arrayThreads[i],NULL,m_timer2,NULL);
         }
     }
-    
+
+    int inicio= 4194304;
+    i =0;
+    while (inicio<pow(2,24)){
+        memoria_fisica->tabla_paginas[i]=inicio;
+        memoria_fisica->pagina_ocupada[i]=false;
+        printf("bloque %d en direccion %d cargado\n",i,inicio);
+        i++;
+        inicio+=256;
+    }
+    printf("Fin del proceso de creacion de paginas de memoria, la ultima direccion es %d con indice %d  \n",inicio-256,i-1);
+
 }
     
 int main(int argc, char const *argv[])
@@ -183,7 +195,7 @@ void* m_timer2(void *tid){
             tick_global=0;
             printf("--------------tic del timer global\n");
             //hay que meter un semaforo por aqui
-            /**
+            
             int i,j,k;
             for (i = 0; i < cantidad->cpus; i++)
             {
@@ -191,9 +203,6 @@ void* m_timer2(void *tid){
                 {
                     for (k = 0; k < cantidad->hilos; k++)
                     {
-                        /** hay que cambiarlo 
-                         * porque el nuevo sistema no utiliza tiempos de vida
-                         * el nuevo sistema depende del tipo de instruccion, cuando recibe un exit termina
                         
                         if(machine->listaCPUs[i].listCores[j].listHilos[k].ocupado){
                             machine->listaCPUs[i].listCores[j].listHilos[k].task.tiempo_vida--;
@@ -205,7 +214,7 @@ void* m_timer2(void *tid){
                     }
                     
                 }
-            }**/
+            }
             
         }
         pthread_mutex_unlock(&m_clock_timer2);
@@ -219,7 +228,7 @@ void* m_timer2(void *tid){
  * */
 
 //la funcion actual le falta el manejo de páginas y la memoria física
-void* processGenerator(void *tid){
+void* loader(void *tid){
     printf("empieza el process generator \n");
     while (1)
     {
@@ -229,101 +238,109 @@ void* processGenerator(void *tid){
         if (buffer_timer_sch == 1)
         {
             buffer_timer_sch = 0;
-
-            pcb_t * task = crearPcb(idPCB);
-            printf("---------creado pcb con id %i  \n ", task->idPCB);
-            idPCB++;
-            int memoria[256];
-            char inicio[20], variante[20], fin[20],data[20],text[20],cero[10],ruta[20];
-            int mem_pos=0;
-            strcpy(cero,"0");
-            strcpy(inicio,"prog0");
-            strcpy(fin,".elf");
-            sprintf(variante,"%d",indice_archivo);
-            strcpy(ruta,inicio);
-            if(indice_archivo<10){
-                strcat(ruta,cero);
-            }
-            strcat(ruta,variante);
-            strcat(ruta,fin);
-            printf("ruta del archivo:   %s    \n",ruta);
-            FILE *fp = fopen(ruta, "r");
-            if(fp == NULL) {
-                perror("Unable to open file!");
-                exit(1);
-            }
-            char *line = NULL;
-            size_t len = 0;
-            int j=0;
-            while(getline(&line, &len, fp) != -1) {
-                int k=0,encontrado= 0, x=0;
-                char espacio =' ';
-                if(j==0){
-                    while(line[k]!='\n'){
-                    char act=line[k];
-                    if(!encontrado) encontrado=(act==espacio)?1:0;
-                    if (encontrado==1){
-                        if(act!=espacio){
-                        text[x]=act;
-                        x++;
+            int paginaLibre=buscarPaginaLibre(),direccion_pagina_fisica;
+            if(paginaLibre!= -1){
+                direccion_pagina_fisica=memoria_fisica->tabla_paginas[paginaLibre];
+                pcb_t * task = crearPcb(idPCB);
+                printf("---------creado pcb con id %i  \n ", task->idPCB);
+                idPCB++;
+                int memoria[256];
+                char inicio[20], variante[20], fin[20],data[20],text[20],cero[10],ruta[20];
+                int mem_pos=0;
+                strcpy(cero,"0");
+                strcpy(inicio,"prog0");
+                strcpy(fin,".elf");
+                sprintf(variante,"%d",indice_archivo);
+                strcpy(ruta,inicio);
+                if(indice_archivo<10){
+                    strcat(ruta,cero);
+                }
+                strcat(ruta,variante);
+                strcat(ruta,fin);
+                printf("ruta del archivo:   %s    \n",ruta);
+                FILE *fp = fopen(ruta, "r");
+                if(fp == NULL) {
+                    perror("Unable to open file!");
+                    exit(1);
+                }
+                char *line = NULL;
+                size_t len = 0;
+                int j=0;
+                while(getline(&line, &len, fp) != -1) {
+                    int k=0,encontrado= 0, x=0;
+                    char espacio =' ';
+                    if(j==0){
+                        while(line[k]!='\n'){
+                            char act=line[k];
+                            if(!encontrado) encontrado=(act==espacio)?1:0;
+                            if (encontrado==1){
+                                if(act!=espacio){
+                                    text[x]=act;
+                                    x++;
+                                }
+                            }
+                            k++;
                         }
-                    }
-                    k++;
-                    }
-                    printf("direccion text %s \n", text);
+                        printf("direccion text %s \n", text);
 
-                }else if(j==1) {
-                    while(line[k]!='\n'){
-                    char act=line[k];
-                    if(!encontrado) encontrado=(act==espacio)?1:0;
-                    if (encontrado==1){
-                        if(act!=espacio){
-                        data[x]=act;
-                        x++;
+                    }else if(j==1) {
+                        while(line[k]!='\n'){
+                            char act=line[k];
+                            if(!encontrado) encontrado=(act==espacio)?1:0;
+                            if (encontrado==1){
+                                if(act!=espacio){
+                                    data[x]=act;
+                                    x++;
+                                }
+                            }
+                            k++;
                         }
-                    }
-                    k++;
-                    }
-                    printf("direccion data %s \n", data);
+                        printf("direccion data %s \n", data);
 
-                }else{
-                    int parte=0, pos=0;
-                    char bloque[3];
-                    strcpy(bloque,"0");
-                    while(line[k]!='\n'){
-                    if(k/2!=parte){
+                    }else{
+                        int parte=0, pos=0;
+                        char bloque[3];
+                        strcpy(bloque,"0");
+                        while(line[k]!='\n'){
+                            if(k/2!=parte){
+                                memoria[mem_pos]=(int)strtol(bloque, NULL, 16);
+                                printf("bloque nº %d añadido con valor %s en posicion %d \n",parte,bloque,mem_pos);
+                                parte=k/2;
+                                mem_pos++;
+                                pos=0;
+                            }
+                            bloque[pos]=line[k];
+                            pos++;
+                            k++;
+                        }
                         memoria[mem_pos]=(int)strtol(bloque, NULL, 16);
                         printf("bloque nº %d añadido con valor %s en posicion %d \n",parte,bloque,mem_pos);
-                        parte=k/2;
                         mem_pos++;
-                        pos=0;
+
                     }
-                    bloque[pos]=line[k];
-                    pos++;
-                    k++;
-                    }
-                    memoria[mem_pos]=(int)strtol(bloque, NULL, 16);
-                    printf("bloque nº %d añadido con valor %s en posicion %d \n",parte,bloque,mem_pos);
-                    mem_pos++;
+                    printf("la linea contiene %s",line);
+                    j++;
 
                 }
-                printf("la linea contiene %s",line);
-                j++;
-
+                j=0;
+                while(j<mem_pos){
+                    memoria_fisica->memoria[direccion_pagina_fisica+j]=memoria[j];
+                    j++;
+                }
+                printf("bloque guardado en pagina %d con direccion fisica %d \n",paginaLibre,direccion_pagina_fisica);
+                strcpy(task->meme->code,text);
+                strcpy(task->meme->data,data);
+                task->meme->pgb=direccion_pagina_fisica;
+                fclose(fp);
+                free(line);
+                indice_archivo++;
+                enque(*task,&pq);
+                buffer_pg_sc++;
+                printf("Fin ciclo loader \n"); 
             }
-            j=0;
-            while(j<(len-1)){
-                
-            }
-            strcpy(task->meme->code,text);
-            strcpy(task->meme->data,data);
-            fclose(fp);
-            free(line);
-            indice_archivo++;
-            enque(*task,&pq);
-            buffer_pg_sc++;
         }
-       pthread_mutex_unlock(&m_sched_timer);      
+       pthread_mutex_unlock(&m_sched_timer);     
+       
        usleep(1000); 
     }
 }
@@ -421,29 +438,163 @@ int buscarCola(){
 }
 
 
-/* esta porción de código ha salido del futuro loader y se encarga de hacer la reconstrucción de las posiciones de memoria en palabras*/
-/**
- * char reconstruccion[20];
-    int mem_cp=mem_pos-4;
-    while(mem_cp<mem_pos){
-    char temp[3];
-    if(mem_pos-mem_cp==4){
-        sprintf(temp,"%X",memoria[mem_cp]);
-        if(strlen(temp)==1){
-        strcpy(reconstruccion,cero);
-        strcat(reconstruccion,temp);
+
+int buscarPaginaLibre(){
+    int i=0;
+    bool encontrado=false;
+    while ( !encontrado && i!=49152){
+        encontrado = !memoria_fisica->pagina_ocupada[i];
+        i+=(encontrado)?0:1;
+    }
+    if(encontrado)memoria_fisica->pagina_ocupada[i]=true;
+    return(encontrado)?i:-1;
+}
+
+bool ejecutarCicloHilo(hilo_t *hiloActual){
+    bool terminado;
+    int  direccion_instruccion_act=0;
+    if (hiloActual->pc != "X"){
+        direccion_instruccion_act=traducirDireccion(hiloActual->pc);
+    }
+
+    direccion_instruccion_act+= hiloActual->task.meme->pgb;
+    unsigned char* palabra =malloc(sizeof(unsigned char)*9);
+    palabra= obtenerPalabra(direccion_instruccion_act);
+    strcpy(hiloActual->ir,palabra);
+    char instruccion = palabra[0];
+    switch (instruccion){
+        //caso exit
+        case 'F' : 
+            terminado= true;
+            break;
+
+        //caso load
+        case '0' :
+            int direccion_registro;
+            char rx[2];
+            strcpy(rx,palabra[1]);
+            direccion_registro=traducirDireccion(rx);
+            char v_direccion[7];
+            int i=2;
+            while(i!=8){
+                char tmp[2];
+                sprintf(tmp,"%X",palabra[i]);
+                if(i==2){
+                    strcpy(v_direccion,tmp);
+                }else{
+                    strcat(v_direccion,tmp);
+                }
+                i++;
+            }
+            int direccion_virtual= traducirDireccion(v_direccion)+hiloActual->task.meme->pgb;
+            palabra=obtenerPalabra(direccion_virtual);
+            int valor_memoria= traducirDireccion(palabra);
+            hiloActual->registro[direccion_registro]=valor_memoria;
+            break;
+
+
+        //caso store
+        case '1':
+            int direccion_registro;
+            char rx[2];
+            strcpy(rx,palabra[1]);
+            direccion_registro=traducirDireccion(rx);
+            char v_direccion[7];
+            int i=2;
+            while(i!=8){
+                char tmp[2];
+                sprintf(tmp,"%X",palabra[i]);
+                if(i==2){
+                    strcpy(v_direccion,tmp);
+                }else{
+                    strcat(v_direccion,tmp);
+                }
+                i++;
+            }
+            int direccion_virtual= traducirDireccion(v_direccion)+hiloActual->pc;
+            unsigned char* valor_reg = malloc(sizeof(unsigned char)*9);
+            sprintf(valor_reg,"%X",hiloActual->registro[direccion_registro]);
+            while(valor_reg[8]!='\n'){
+                char cero[9];
+                strcpy(cero,"0");
+                strcat(cero,valor_reg);
+                strcpy(valor_reg,cero);
+            }
+
+            int parte=0, pos=0, k =0;
+            char bloque[3];
+            strcpy(bloque,"0");
+            while(valor_reg[k]!='\n'){
+                if(k/2!=parte){
+                    memoria_fisica->memoria[direccion_virtual]=(int)strtol(bloque, NULL, 16);
+                    printf("bloque nº %d añadido con valor %s en posicion %d \n",parte,bloque,direccion_virtual);
+                    parte=k/2;
+                    direccion_virtual++;
+                    pos=0;
+                }
+                bloque[pos]=valor_reg[k];
+                pos++;
+                k++;
+            }
+            memoria_fisica->memoria[direccion_virtual]=(int)strtol(bloque, NULL, 16);
+            printf("bloque nº %d añadido con valor %s en posicion %d \n",parte,bloque,direccion_virtual);
+            
+            
+        //caso add
+        case '2':
+            char rx[2];
+            strcpy(rx,palabra[1]);
+            int direccion_registro_destino= traducirDireccion(rx);
+            strcpy(rx,palabra[2]);
+            int direccion_registro_a=traducirDireccion(rx);
+            strcpy(rx,palabra[3]);
+            int direccion_registro_b=traducirDireccion(rx); 
+            hiloActual->registro[direccion_registro_destino]=hiloActual->registro[direccion_registro_a] + hiloActual->registro[direccion_registro_b];
+            break;
+            
+    }
+    direccion_instruccion_act=0;
+    if(hiloActual->pc!="X")direccion_instruccion_act=traducirDireccion(hiloActual->pc);
+    direccion_instruccion_act+=4;  
+    sprintf(hiloActual->pc,"%X",direccion_instruccion_act);
+    return terminado;
+}
+
+
+//recibe un char en hexadecimal y devuelve un entero en base 10 tambien sirve para convertir los valores de los datos
+int traducirDireccion(unsigned char *direccion){
+    int x=(int)strtol(direccion, NULL, 16); 
+    char temp[10];
+    sprintf(temp,"%d",x);
+    x=(int)strtol(temp, NULL, 10);
+    return x;
+}
+
+unsigned char* obtenerPalabra(int posicion){
+    unsigned char* palabra= malloc(sizeof(unsigned char)*9);
+    int max= posicion+4;
+
+    char reconstruccion[20],cero[2];
+    strcpy(cero,"0");
+    while(posicion<max){
+        char temp[3];
+        if(max-posicion==4){
+            sprintf(temp,"%X",memoria_fisica->memoria[posicion]);
+            if(strlen(temp)==1){
+            strcpy(reconstruccion,cero);
+            strcat(reconstruccion,temp);
+            }else{
+            strcpy(reconstruccion,temp);
+            }
+            
         }else{
-        strcpy(reconstruccion,temp);
+            sprintf(temp,"%X",memoria_fisica->memoria[posicion]);
+            if(strlen(temp)==1) strcat(reconstruccion,cero);
+            strcat(reconstruccion,temp);
         }
-        
-    }else{
-        sprintf(temp,"%X",memoria[mem_cp]);
-        if(strlen(temp)==1) strcat(reconstruccion,cero);
-        strcat(reconstruccion,temp);
+        printf("el valor en %d es %s\n",posicion,temp);
+        posicion++;
     }
-    printf("el valor en %d es %s\n",mem_cp,temp);
-    mem_cp++;
-    }
-    printf("no peta en el bucle");
-    printf("el bloque reconstruido es %s \n",reconstruccion);
-*/
+    strcpy(palabra,reconstruccion);
+    return palabra;
+}
